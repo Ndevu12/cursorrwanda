@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { HACKATHON_PATH } from '../config'
-
   let menuOpen = $state(false);
 
   const navLinks = [
@@ -9,7 +7,6 @@
     { href: '/#community', label: 'Community' },
     { href: '/#gallery', label: 'Gallery' },
     { href: '/#events', label: 'Events' },
-    { href: HACKATHON_PATH, label: 'Hackathon' },
     { href: '/#join', label: 'Join' },
   ];
 </script>

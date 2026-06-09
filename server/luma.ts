@@ -43,6 +43,15 @@ export type SiteEventsPayload = {
 
 const LUMA_API_BASE = 'https://public-api.luma.com/v1'
 
+export function normalizeLumaApiKey(apiKey: string | undefined): string | undefined {
+  const trimmed = apiKey?.trim()
+  return trimmed || undefined
+}
+
+export function isEventsPayloadEmpty(payload: SiteEventsPayload): boolean {
+  return payload.upcoming.length === 0 && payload.past.length === 0
+}
+
 function formatEventDate(iso: string, timezone = 'Africa/Kigali'): string {
   return new Intl.DateTimeFormat('en-US', {
     month: 'short',
@@ -140,6 +149,11 @@ export function partitionEvents(entries: LumaEventEntry[]): SiteEventsPayload {
 }
 
 export async function getSiteEvents(apiKey: string): Promise<SiteEventsPayload> {
-  const entries = await fetchAllLumaEvents(apiKey)
+  const normalizedKey = normalizeLumaApiKey(apiKey)
+  if (!normalizedKey) {
+    throw new Error('LUMA_API_KEY is not configured')
+  }
+
+  const entries = await fetchAllLumaEvents(normalizedKey)
   return partitionEvents(entries)
 }

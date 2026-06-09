@@ -2,12 +2,34 @@ import type { Plugin, PreviewServer, ViteDevServer } from 'vite'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { getLumaApiKey } from '../server/env'
-import { getSiteEvents } from '../server/luma'
+import { getSiteEvents, isEventsPayloadEmpty, type SiteEventsPayload } from '../server/luma'
 
 const EMPTY_EVENTS = {
   upcoming: [],
   past: [],
   fetchedAt: new Date(0).toISOString(),
+}
+
+function readEventsSnapshot(path: string): SiteEventsPayload | null {
+  if (!existsSync(path)) return null
+
+  try {
+    const payload: unknown = JSON.parse(readFileSync(path, 'utf8'))
+    if (
+      typeof payload === 'object' &&
+      payload !== null &&
+      'upcoming' in payload &&
+      'past' in payload &&
+      Array.isArray((payload as SiteEventsPayload).upcoming) &&
+      Array.isArray((payload as SiteEventsPayload).past)
+    ) {
+      return payload as SiteEventsPayload
+    }
+  } catch {
+    return null
+  }
+
+  return null
 }
 
 function attachEventsHandler(
@@ -70,6 +92,15 @@ export function lumaApiPlugin(): Plugin {
 
       try {
         const payload = await getSiteEvents(apiKey)
+        const existing = readEventsSnapshot(outputPath)
+
+        if (isEventsPayloadEmpty(payload) && existing && !isEventsPayloadEmpty(existing)) {
+          this.warn(
+            'Luma API returned no events — keeping the committed public/events.json snapshot.',
+          )
+          return
+        }
+
         writeFileSync(outputPath, JSON.stringify(payload, null, 2))
       } catch (error) {
         this.warn(

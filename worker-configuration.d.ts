@@ -3,7 +3,6 @@
 // Runtime types generated with workerd@1.20260526.1 2026-05-28 
 interface __BaseEnv_Env {
 	ASSETS: Fetcher;
-	EMAIL: SendEmail;
 	LUMA_API_KEY: string;
 	LUMA_CALENDAR_ID: string;
 }

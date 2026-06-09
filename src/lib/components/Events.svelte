@@ -1,15 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import {
-    HACKATHON_DATE_LABEL,
-    HACKATHON_LOCATION,
-    HACKATHON_PATH,
-    HACKATHON_TITLE,
-    LUMA_CALENDAR_URL,
-  } from '../config'
+  import { LUMA_CALENDAR_URL } from '../config'
   import { loadEvents, type SiteEvent } from '../luma'
 
-  function isFeaturedHackathon(event: SiteEvent): boolean {
+  function isHackathonEvent(event: SiteEvent): boolean {
     const title = event.title.toLowerCase()
     return title.includes('hackathon') || title.includes('hackthon')
   }
@@ -22,7 +16,7 @@
   onMount(async () => {
     try {
       const payload = await loadEvents()
-      upcoming = payload.upcoming.filter((event) => !isFeaturedHackathon(event))
+      upcoming = payload.upcoming
       past = payload.past
     } catch (e) {
       error = e instanceof Error ? e.message : 'Failed to load events'
@@ -40,19 +34,6 @@
       <p class="section-intro">
         Meetups, workshops, and build nights across Kigali.
       </p>
-    </div>
-
-    <div class="event-list featured-list">
-      <a href={HACKATHON_PATH} class="event featured">
-        <div class="event-date">{HACKATHON_DATE_LABEL}</div>
-        <div class="event-content">
-          <div class="event-top">
-            <h4>{HACKATHON_TITLE}</h4>
-            <span class="badge upcoming">Hackathon</span>
-          </div>
-          <p class="event-location">{HACKATHON_LOCATION}</p>
-        </div>
-      </a>
     </div>
 
     {#if loading}
@@ -86,15 +67,24 @@
         {:else}
           <div class="event-list">
             {#each upcoming as event}
-              <a href={event.url} target="_blank" rel="noreferrer" class="event">
+              {@const hackathon = isHackathonEvent(event)}
+              <a
+                href={event.url}
+                target="_blank"
+                rel="noreferrer"
+                class="event"
+                class:featured={hackathon}
+              >
                 <div class="event-date">{event.date}</div>
                 <div class="event-content">
                   <div class="event-top">
                     <h4>{event.title}</h4>
-                    <span class="badge upcoming">Upcoming</span>
+                    <span class="badge upcoming">{hackathon ? 'Hackathon' : 'Upcoming'}</span>
                   </div>
                   <p class="event-location">{event.location}</p>
-                  <p class="event-desc">{event.description}</p>
+                  {#if !hackathon}
+                    <p class="event-desc">{event.description}</p>
+                  {/if}
                 </div>
               </a>
             {/each}
@@ -136,14 +126,6 @@
 </section>
 
 <style>
-  .featured-list {
-    margin-bottom: 2rem;
-  }
-
-  .event.featured .event-date {
-    color: var(--accent);
-  }
-
   .events-block + .events-block {
     margin-top: 3rem;
   }
@@ -202,6 +184,10 @@
 
   .event:hover {
     background: var(--card-01);
+  }
+
+  .event.featured .event-date {
+    color: var(--accent);
   }
 
   .event.past {

@@ -8,13 +8,10 @@
     "binding": "ASSETS",
     "not_found_handling": "single-page-application"
   },
+  "vars": {
+    "LUMA_CALENDAR_ID": "cal-94zoOAtNpqPIIHm"
+  },
   "observability": {
     "enabled": true
-  },
-  "send_email": [
-    {
-      "name": "EMAIL",
-      "remote": true
-    }
-  ]
+  }
 }

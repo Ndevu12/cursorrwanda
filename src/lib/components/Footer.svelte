@@ -1,7 +1,3 @@
-<script lang="ts">
-  import { HACKATHON_PATH } from '../config'
-</script>
-
 <footer class="footer">
   <div class="container footer-inner">
     <div class="footer-brand">
@@ -20,7 +16,6 @@
         <a href="/#team">Team</a>
         <a href="/#gallery">Gallery</a>
         <a href="/#events">Events</a>
-        <a href={HACKATHON_PATH}>Hackathon</a>
         <a href="/#join">Join</a>
       </div>
       <div>
