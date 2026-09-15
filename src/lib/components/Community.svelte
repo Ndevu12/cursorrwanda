@@ -23,7 +23,7 @@
 
     <div class="stats">
       <div class="stat">
-        <span class="stat-value">50+</span>
+        <span class="stat-value">200+</span>
         <span class="stat-label">Community members</span>
       </div>
       <div class="stat">
